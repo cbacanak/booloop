@@ -637,12 +637,15 @@ Görsel üretim yolu henüz seçilmedi (§14). AI kullanılırsa:
 booloop/
   PLAN.md
   CLAUDE.md
+  project.yml              # XcodeGen; Booloop.xcodeproj üretilir, depoya girmez
   Booloop/                 # Xcode uygulaması (SpriteKit sahnesi, UI)
+  BooloopTests/            # uygulama testleri (sahne üzerinden çözüm oynatma)
   Packages/BooloopCore/    # saf Swift: kurallar, çözücü, veri modeli
   data/levels-200.json
   tools/booloop_gen.py     # referans kurallar + çözücü + üreteç
   tools/build_levels.py    # bölüm üretimi ve doğrulama
   tools/make_slide_golden.py  # Swift için kayma altın verisi
+  tools/level4_candidates.py  # FTUE 4. seviye aday üretimi ve seçimi (§5)
   tools/coin_sim.py        # coin ekonomisi simülasyonu (§7.5)
 ```
 
