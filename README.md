@@ -13,7 +13,6 @@ yanınca gece biter.
 |---|---|
 | `PLAN.md` | Tek kaynak: kurallar, mekanikler, 200 bölüm, gelir, metrikler, teknik yapı, aşamalar, mağaza |
 | `CLAUDE.md` | Kodlama ajanı için çalışma kuralları ve değişmezler |
-| `BOSLUK-ANALIZI.md` | Açık kalan hukuki, teknik ve ürün maddeleri, öncelik sırasıyla |
 | `DROPWARD-EK.md` | Diğer projeye taşınacak bulgular (bu repoda kalması gerekmez) |
 
 Kural `PLAN.md` §2'de yazmıyorsa oyunda yoktur.
