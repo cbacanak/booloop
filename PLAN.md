@@ -642,6 +642,7 @@ booloop/
   data/levels-200.json
   tools/booloop_gen.py     # referans kurallar + çözücü + üreteç
   tools/build_levels.py    # bölüm üretimi ve doğrulama
+  tools/make_slide_golden.py  # Swift için kayma altın verisi
   tools/coin_sim.py        # coin ekonomisi simülasyonu (§7.5)
 ```
 
@@ -660,7 +661,10 @@ booloop/
      karesi, zincirleme bırakma, ağda durma, ok döngüsü sınırı, kapının
      açılması.
 - **Performans hedefi:** ipucu ve çıkmaz tespiti cihazda < 100 ms.
-  Ölçümde durum uzayı bölüm başına ~60 bine kadar çıkıyor. Hedef
+  Üreteç adayları 60 bin durum sınırıyla taranıyor; yayınlanan 200
+  bölümde ulaşılabilir uzay en fazla 7.825 durum (#200). Swift'te bu
+  uzayın tamamı Mac'te (M serisi, release) 5,4 ms'de taranıyor; 200
+  bölümün toplamı 47 ms (18 Eyl 2026). Cihaz ölçümü Aşama 2'de. Hedef
   tutmazsa çıkmaz tespiti arka planda yapılır ve sonuç gelene kadar
   gösterge sessiz kalır.
 

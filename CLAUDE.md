@@ -25,7 +25,8 @@ Tek kaynak `PLAN.md`. Kural orada yazmıyorsa oyunda yoktur.
 1. PLAN.md §2 güncellenir (`rules_version` artar).
 2. `tools/booloop_gen.py` güncellenir.
 3. Bölümler yeniden üretilir ve doğrulanır (`build_levels.py assemble`).
-4. Swift çekirdeği ve altın testler güncellenir.
+4. Swift çekirdeği ve altın testler güncellenir; kayma altın verisi
+   `python3 tools/make_slide_golden.py` ile yeniden üretilir.
 
 Yayınlanmış bölümler varsa kural değişikliği yalnızca yeni
 `rules_version` ile ve eski bölümlerin doğrulanmasıyla yapılır.
@@ -36,6 +37,9 @@ Yayınlanmış bölümler varsa kural değişikliği yalnızca yeni
   yeşil olmalı.
 - Altın test: `data/levels-200.json` içindeki 200 çözüm yeniden oynatılır
   ve Swift çözücü aynı par'ı bulur.
+- Kayma altın testi: `Tests/BooloopCoreTests/Fixtures/slide-golden.json`
+  içindeki 600 rastgele hamle dizisinde Swift her adımda Python ile aynı
+  durumu bulur.
 
 ## Bölüm üretimi
 
