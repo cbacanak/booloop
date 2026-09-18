@@ -43,13 +43,10 @@ Snacky Dash yorumlarındaki iki şikâyet tasarımı doğrudan etkiledi:
 güçlendirici olmadan geçilemeyen bölümler ve mekaniklerin çok erken, üst
 üste gelmesi. İkisi de §4 ve §7'de kurala bağlandı.
 
-**Doğrulanmamış varsayım.** Farkın özü "ilk toplanan ilk bırakılır".
-Snacky Dash'in mağaza metni "önce bütün meyveleri topla, sonra
-kamyonlara git" diyor; gövdedeki sıranın teslimde önemli olup olmadığı
-mağaza sayfalarında ve yorumlarda yazmıyor (18 Eyl araştırması). Sıra
-orada da önemliyse fark zayıflar ve bu tablo yeniden yazılır.
-**Aşama 1'den önce** Snacky Dash'te 20–30 bölüm oynanarak doğrulanır
-(§11 Aşama 0). Google Play'de ~4,3★, 500 bin+ indirme.
+**Doğrulandı (18 Eyl 2026, oynanarak):** Snacky Dash'te kamyona
+teslimde gövdedeki sıra **önemsiz**; eşleşen meyve konumundan bağımsız
+boşalıyor. "İlk toplanan ilk bırakılır" kuralı yapısal fark olarak
+geçerli. Snacky Dash Google Play'de ~4,3★, 500 bin+ indirme.
 
 ---
 
@@ -739,14 +736,19 @@ booloop/
 
 ## 11. Aşamalar ve kapılar
 
-**Aşama 0 — İsim kilidi ve ön kontroller (bugün)**
-App Store Connect'te uygulama kaydı, alan adı, TikTok/Instagram/X
-kullanıcı adları, TÜRKPATENT ve TMview araması. Ayrıca:
-- Snacky Dash'te 20–30 bölüm oyna: gövde sırası teslimde önemli mi
-  (§1.1)?
-- Mali müşavirle hesap türü ve 20/B görüşmesi (§12.5).
+**Aşama 0 — İsim kilidi ve ön kontroller**
+- ✅ Snacky Dash farkı doğrulandı (§1.1, 18 Eyl).
+- Alan adı, TikTok/Instagram/X kullanıcı adları, TÜRKPATENT ve TMview
+  araması: hesap gerektirmez, şimdi yapılabilir.
+- ⏸ App Store Connect'te uygulama kaydı: **Apple Developer hesabı yok,
+  bekliyor.** Risk: App Store'da uygulama adı tekildir; kayıt
+  yapılana kadar "Booloop" adını başkası alabilir. Hesap en geç
+  Aşama 3'ten (TestFlight) önce açılır; Aşama 2'de cihaz testi ücretsiz
+  Apple hesabıyla yapılabilir.
+- Mali müşavir görüşmesi Aşama 4'e taşındı (yayından önce, §12.5).
 
-*Kapı:* isim ayrıldı ve fark doğrulandı.
+*Kapı:* fark doğrulandı ✅; isim kilidi hesap açılınca tamamlanır.
+Aşama 1 bu kapıyı beklemez.
 
 **Aşama 1 — Çekirdek**
 BooloopCore: kurallar, çözücü, çıkmaz tespiti, JSON yükleyici, altın
@@ -785,7 +787,8 @@ Marka (§9.1), reklam ve satın alma entegrasyonu, reklam izni akışı
 mağaza varlıkları, mağaza metinlerinin yerelleştirilmesi (§12.1),
 inceleme notları (§12.2), yaş derecelendirme anketi, DSA tüccar beyanı
 ve yaş güvencesi kontrolü (§12.4), Small Business Program başvurusu
-(§12.5), lansman öne çıkarma başvurusu (§12.6), ASO becerilerinin
+(§12.5), mali müşavir görüşmesi ve 20/B istisna belgesi (§12.5; ilk
+gelirden önce), lansman öne çıkarma başvurusu (§12.6), ASO becerilerinin
 kurulumu (§12.3).
 *Kapı:* Apple onayı.
 
@@ -1047,9 +1050,10 @@ Aşama 4'te Apple ve Google'ın kendi sayfasından yeniden okunur.
 8. 9. ve 10. bölümde eğrinin alt seviyeleri için daha uzun üretim
 9. Geçiş reklamı kalsın mı? Dropward bunu reddetti; Booloop'ta sınırlı
    tutuldu. Aşama 5'te D1/D7 ve yorumlara göre karar verilir.
-10. Snacky Dash'te gövde sırası teslimde önemli mi? (Aşama 0, §1.1)
+10. Apple Developer hesabı ne zaman açılacak? (En geç Aşama 3; §11
+    Aşama 0)
 11. Hesap türünün mali müşavirle onayı; 20/B reklam gelirini kapsıyor
-    mu? (Aşama 0, özelge; §12.5)
+    mu? (Aşama 4, yayından önce; özelge; §12.5)
 12. Yaş anketinde Game Center lider tablosu "yarışma" sayılır mı?
     (Aşama 4, §12.4)
 13. Coin ekonomisi fazla cömert mi? (§7.5; Aşama 5 verisi)
@@ -1057,4 +1061,5 @@ Aşama 4'te Apple ve Google'ın kendi sayfasından yeniden okunur.
 
 **18 Eyl'de kapananlar:** deployment target → iOS 26 (§10.3); iCloud
 senkronu → Aşama 3'te zorunlu (§10.3); günlük modun saat dilimi →
-yerel gece yarısı (§6.2.1).
+yerel gece yarısı (§6.2.1); Snacky Dash'te sıra önemsiz → fark geçerli
+(§1.1).
