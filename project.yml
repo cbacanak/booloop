@@ -1,0 +1,84 @@
+# XcodeGen proje tanımı (PLAN.md §10). Üretim: `xcodegen generate` (brew install xcodegen).
+# Üretilen Booloop.xcodeproj depoya girmez (.gitignore); tek kaynak bu dosya.
+name: Booloop
+options:
+  bundleIdPrefix: com.cbacanak
+  deploymentTarget:
+    iOS: "26.0"
+  xcodeVersion: "26.0"
+  createIntermediateGroups: true
+  groupSortPosition: top
+  generateEmptyDirectories: false
+
+packages:
+  BooloopCore:
+    path: Packages/BooloopCore
+
+settings:
+  base:
+    SWIFT_VERSION: "5.0"
+    IPHONEOS_DEPLOYMENT_TARGET: "26.0"
+    TARGETED_DEVICE_FAMILY: "1"          # yalnızca iPhone
+    CODE_SIGN_STYLE: Automatic
+    DEVELOPMENT_TEAM: ""                  # Xcode > Signing & Capabilities'te seçilir
+    ENABLE_USER_SCRIPT_SANDBOXING: YES
+    SWIFT_STRICT_CONCURRENCY: minimal
+
+targets:
+  Booloop:
+    type: application
+    platform: iOS
+    sources:
+      - path: Booloop
+        excludes:
+          - "Info.plist"
+          - "PrivacyInfo.xcprivacy"
+      - path: Booloop/PrivacyInfo.xcprivacy
+        buildPhase: resources
+      - path: data/levels-200.json
+        buildPhase: resources
+    dependencies:
+      - package: BooloopCore
+        product: BooloopCore
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.cbacanak.booloop
+        PRODUCT_NAME: Booloop
+        MARKETING_VERSION: "0.1.0"
+        CURRENT_PROJECT_VERSION: "1"
+        GENERATE_INFOPLIST_FILE: NO
+        INFOPLIST_FILE: Booloop/Info.plist
+        SUPPORTED_INTERFACE_ORIENTATIONS: UIInterfaceOrientationPortrait
+        SUPPORTED_INTERFACE_ORIENTATIONS_IPHONE: UIInterfaceOrientationPortrait
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
+        SWIFT_EMIT_LOC_STRINGS: YES
+
+  BooloopTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - path: BooloopTests
+    dependencies:
+      - target: Booloop
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.cbacanak.booloop.tests
+        GENERATE_INFOPLIST_FILE: YES
+
+schemes:
+  Booloop:
+    build:
+      targets:
+        Booloop: all
+        BooloopTests: [test]
+    run:
+      config: Debug
+    test:
+      config: Debug
+      targets:
+        - BooloopTests
+    profile:
+      config: Release
+    archive:
+      config: Release
