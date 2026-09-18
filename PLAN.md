@@ -5,9 +5,10 @@
 **Platform:** yalnızca iOS, iPhone, dikey. Android ve iPad bu planın dışında.
 **Motor:** Swift + SpriteKit. Kurallar ve çözücü, SpriteKit'e bağımlı olmayan
 saf bir Swift paketinde (`BooloopCore`).
-**Durum (16 Eyl 2026):** kurallar net, 200 bölüm üretildi ve doğrulandı
+**Durum (18 Eyl 2026):** kurallar net, 200 bölüm üretildi ve doğrulandı
 (`data/levels-200.json`), referans üreteç ve çözücü hazır (`tools/`).
-Kod yazılmadı.
+Kod yazılmadı. 16 Eyl boşluk analizinin Booloop'a ait bütün maddeleri
+18 Eyl'de araştırılıp bu belgeye işlendi; ayrı dosya kaldırıldı.
 
 Bu belge tek kaynak. Bir kural burada yazmıyorsa oyunda yoktur. Bir kural
 değişirse önce burası değişir, sonra kod.
@@ -41,6 +42,14 @@ haftada kopyalar:
 Snacky Dash yorumlarındaki iki şikâyet tasarımı doğrudan etkiledi:
 güçlendirici olmadan geçilemeyen bölümler ve mekaniklerin çok erken, üst
 üste gelmesi. İkisi de §4 ve §7'de kurala bağlandı.
+
+**Doğrulanmamış varsayım.** Farkın özü "ilk toplanan ilk bırakılır".
+Snacky Dash'in mağaza metni "önce bütün meyveleri topla, sonra
+kamyonlara git" diyor; gövdedeki sıranın teslimde önemli olup olmadığı
+mağaza sayfalarında ve yorumlarda yazmıyor (18 Eyl araştırması). Sıra
+orada da önemliyse fark zayıflar ve bu tablo yeniden yazılır.
+**Aşama 1'den önce** Snacky Dash'te 20–30 bölüm oynanarak doğrulanır
+(§11 Aşama 0). Google Play'de ~4,3★, 500 bin+ indirme.
 
 ---
 
@@ -317,8 +326,9 @@ gösterir.
 
 ### 6.2 Günlük gece
 - Her gün herkes için aynı bölüm. Önceden üretilmiş bir havuzdan (en az
-  730 gün) tarihe göre seçilir.
-- Haftanın gününe göre zorluk: Pazartesi kolay, Pazar zor.
+  730 gün) gün numarasına göre seçilir (§6.2.1).
+- Haftanın gününe göre zorluk: Pazartesi kolay, Pazar zor. Havuz haftanın
+  her günü için ayrı zorluk ayarıyla üretilir.
 - **Dokunulmaz kurallar:** güçlendirici yok, reklam yok, hamle hakkı yok
   (sayılır ama sınır yok), geri al serbest.
 - Sonuç kartı spoiler'sız: `Booloop #127 👻 11/9 ⭐⭐` — gün numarası,
@@ -326,6 +336,53 @@ gösterir.
 - Seri (streak) sayacı. Kaçırılan gün seriyi bozar; seri dondurma yok
   (v1).
 - Günlük mod Aşama 3'te gelir; 30. seviyeyi geçmeden açılmaz.
+
+#### 6.2.1 Gün, saat dilimi ve saat oynatma
+
+- **Gün yerel gece yarısında değişir** (Wordle modeli; alışkanlık ve
+  paylaşım için en doğalı). Gün numarası = yerel tarih − başlangıç
+  tarihi + 1. Başlangıç tarihi (#1) yumuşak lansmanın ilk günüdür, kodda
+  sabittir ve sonra değişmez.
+- Aynı #N farklı ülkelerde farklı saatlerde açılır. Kabul edildi: kartta
+  tarih değil numara var, paylaşım bozulmaz.
+- **Seri** yerel takvim günleriyle sayılır. Saat dilimi değişikliğinden
+  doğan tek günlük boşluk seriyi bozmaz; aynı numara iki kez oynanmaz.
+- **Saat oynatma:** cihaz tarihi görülmüş en büyük tarihten geriye
+  giderse günlük bölüm o tarihe yetişene kadar kilitli kalır. İleri
+  alınan saat sunucusuz güvenilir biçimde tespit edilemez; oyuncu
+  yarının bölümünü önceden oynayabilir. Bedeli sınırlı: sonuç yalnızca
+  kendi cihazında görünür, Game Center'a gönderilmeden önce §6.2.2'deki
+  kontrolden geçer.
+
+#### 6.2.2 Game Center
+
+iOS 26'da Game Center oyunları Games uygulamasında görünür. Sunucu
+gerektirmeyen iki yapı kullanılır:
+
+- **Yinelenen lider tablosu "Haftanın gecesi".** Dönem 1 hafta,
+  Pazartesi 00:00 UTC'de başlar. Skor: hafta içinde bitirilen her
+  günlük bölüm için `max(10, 100 − 10 × (hamle − par))`, toplamı.
+  Her gün oynamayı ve par'ı yakalamayı ödüllendirir. Taslak formül,
+  Aşama 3'te ayarlanır.
+  - *Neden günlük değil haftalık:* yinelenen tablolar sabit bir UTC
+    anına bağlı döner, günlük bölüm ise yerel gece yarısında değişir.
+    Günlük tabloda uzak saat dilimlerindeki oyuncular farklı bölümlerle
+    aynı döneme düşerdi. Haftalıkta bu kayma yalnızca hafta sınırında
+    birkaç saati etkiler.
+- **Meydan okuma (Challenge):** bu tabloya bağlı, tekrarlanabilir.
+  Süresi dönemin kalanı. Ayrı kod gerekmez; tabloya gönderilen skor
+  meydan okumaya da sayılır. Oyun haftalık toplamı her günlük bölümden
+  sonra yeniden gönderir; toplam hafta içinde yalnızca arttığı için
+  Apple'ın meydan okumalar için önerdiği "Best Score" türüyle çalışır.
+- **Gönderim kontrolü:** GameKit tablonun geçerli döneminin başlangıcını
+  Apple'ın saatinden verir. Yerel gün numarası bu dönemin içine
+  düşmüyorsa skor gönderilmez.
+- **Hile uyarısı:** skorlar sunucuda doğrulanmaz. Tablo "arkadaşlarınla"
+  çerçevesinde sunulur; "dünya sıralaması", "resmi" gibi dil kullanılmaz.
+- Game Center isteğe bağlıdır; giriş yapmayan oyuncu için her şey
+  çalışır. Giriş istemi FTUE'de değil, günlük mod ilk açıldığında çıkar.
+- Sınırlar: uygulama başına en fazla 20 meydan okuma; her biri 3840×2160
+  görsel, en az bir yerelleştirme ve App Review onayı ister.
 
 ### 6.3 Sonsuz (Aşama 6)
 200. bölümden sonra açılır. Skor: art arda par'da biten bölüm sayısı.
@@ -394,6 +451,38 @@ Takas bir kuralı esnetir. Kullanıldığı bölümde yıldız en fazla 2 olur v
 - **Abonelik / paywall.** Bu oyunda aylık yeni değer vaadi yok.
 - **Günlük modda reklam ya da güçlendirici.** Paylaşılan skorun
   anlamını bozar.
+- **Şans unsuru ve ganimet kutusu.** Rastgele içerikli ücretli ödül
+  yok; yaş derecesini yükseltir (Brezilya'da otomatik 18+) ve §12.4'teki
+  anket yanıtlarını değiştirir.
+
+### 7.5 Coin ekonomisi simülasyonu (18 Eyl 2026)
+
+`tools/coin_sim.py` 200 bölümü üç oyuncu tipiyle 2.000'er kez oynatır.
+Varsayımlar kaba ve Aşama 2–5 verisiyle değişir: yıldız dağılımı,
+bölüme göre artan başarısızlık olasılığı (1. bölümde hak sınırsız
+olduğu için başarısızlık yok), bölüm sonu ×2 reklamını izleme oranı.
+
+| Oyuncu | 3★ / 2★ | Deneme başına başarısızlık (2.→10. bölüm) | ×2 izleme | 200 bölümde kazanç | Başarısızlık | Hepsini coinle +5 ile kurtarma |
+|---|---|---|---|---|---|---|
+| Zayıf | %20 / %40 | %10 → %40 | %30 | ~3.900 | ~64 | ~7.650 |
+| Orta | %35 / %40 | %6 → %28 | %50 | ~5.150 | ~37 | ~4.400 |
+| İyi | %60 / %30 | %3 → %18 | %50 | ~6.150 | ~20 | ~2.400 |
+
+**Sonuç:**
+- Orta ve iyi oyuncu kazandığı coinle bütün başarısızlıklarını
+  kurtarabiliyor; coin satın almaya ihtiyaç duymuyor. Ücretsiz tekrar
+  da olduğu için coin hiçbir zaman zorunlu değil. Bu, §2.6 değişmezinin
+  doğal sonucu ve bilerek korunur.
+- Coin baskısı yalnızca zayıf oyuncuda: kazancının yaklaşık iki katı
+  gerekir.
+- Coin paketlerinden gelen gelire güvenilmez. Gelirin ağırlığı ödüllü
+  reklamda (×2 coin, +5 hamle, ipucu) ve reklamsız pakette.
+- **Paket büyüklükleri (taslak):** 1,99 $ = 500 coin (~4 × +5 hamle),
+  4,99 $ = 1.400 coin, 9,99 $ = 3.200 coin; başlangıç paketi 2,99 $ =
+  600 coin + 2 takas.
+- **Ayar kolları (Aşama 5, gerekirse):** 2★ ödülünü düşürmek, ×2 yerine
+  ×1,5, coin için kozmetik harcama yeri (Aşama 6). Kozmetik, kurala
+  dokunmayan tek coin çukurudur.
 
 ---
 
@@ -467,8 +556,14 @@ araç ya da Mixpanel).
   başlangıç değeri. Uzun kaymalarda hızlanır.
 - **Haptik:** toplama (hafif), bırakma (orta), bölüm sonu (başarı),
   geçersiz kaydırma (hata).
-- **Ses:** toplamada artan tonlar, bırakmada fener çınlaması. Lisanslı
-  ses kullanılırsa lisans belgesi saklanır (§12, madde 6).
+- **Ses:** toplamada artan tonlar, bırakmada fener çınlaması.
+  - Kaynak: lisanslı ya da CC0 efekt kütüphanesi, gerekirse düzenlenerek.
+    Her dosyanın lisans belgesi `assets/licenses/` altında saklanır
+    (§12.2, madde 6).
+  - v1'de müzik yok, yalnızca efekt. Müzik Aşama 6'da, veriye göre.
+  - Ses oturumu `ambient`: sessiz anahtarına uyar, oyuncunun çaldığı
+    müziği kesmez.
+  - Ayarlarda ses ve haptik ayrı ayrı kapatılabilir.
 
 ### 9.1 Marka çalışması (Aşama 4)
 
@@ -496,6 +591,42 @@ slayt şablonu en az dört tür için tek sefer hazırlanır: "bu bölümü
 çözebilir misin", "tek hamlede kaybettim", "par'ı yakaladım", "günlük
 gece #N".
 
+### 9.2 Erişilebilirlik
+
+App Store ürün sayfasında OS 26'dan itibaren Erişilebilirlik Besin
+Etiketleri görünüyor: VoiceOver, Voice Control, Larger Text, Dark
+Interface, Differentiate Without Color Alone, Sufficient Contrast,
+Reduced Motion, Captions, Audio Descriptions. Şimdilik isteğe bağlı;
+Apple zorunlu olacağını duyurdu, tarih vermedi.
+
+- **v1'de beyan edilecekler:** Differentiate Without Color Alone (renk +
+  şekil kuralı, §2.1; gri tonlama filtresiyle test edilir), Sufficient
+  Contrast, Reduced Motion, Dark Interface. Menülerde Dynamic Type
+  ucuza gelirse Larger Text de.
+- **Reduced Motion açıkken:** kare kare kayma yerine hayalet hedef kareye
+  kısa bir solmayla geçer; geçtiği yol kısa süre soluk bir iz olarak
+  kalır, böylece hangi ruhların toplandığı okunur. Parçacık, sarsıntı,
+  parallax yok. Çıkmaz göstergesinde nabız yerine sabit vurgu.
+  Apple'ın ölçütü: anlamlı hareket solma ile değiştirilir, süs hareketi
+  kaldırılır, bütün görevler yapılabilir kalır.
+- **VoiceOver:** v1'de beyan edilmez. Izgarayı sesli anlatmak ayrı bir
+  tasarım işi; Aşama 6 adayı.
+- **Motor:** tek girdi kaydırma. İsteğe bağlı ekran yön düğmeleri Aşama 6
+  adayı.
+
+### 9.3 AI ile görsel üretilirse
+
+Görsel üretim yolu henüz seçilmedi (§14). AI kullanılırsa:
+
+- ABD Telif Hakkı Ofisi (Part 2 raporu, 29 Oca 2025): yalnızca istemle
+  üretilmiş görsel korunmaz; insanın seçimi, düzenlemesi ve değişikliği
+  korunabilir.
+- Bu yüzden hayalet karakteri ve logo insan eliyle çizilir ya da
+  belirgin biçimde yeniden çizilir. Her varlık için istem, seçim ve
+  düzenleme kaydı `art/LOG.md`'de tutulur.
+- App Review'da AI görsele özel kural yok; 4.1 (taklit) ve 5.2 (haklar)
+  geçerli.
+
 ---
 
 ## 10. Teknik yapı
@@ -511,6 +642,7 @@ booloop/
   data/levels-200.json
   tools/booloop_gen.py     # referans kurallar + çözücü + üreteç
   tools/build_levels.py    # bölüm üretimi ve doğrulama
+  tools/coin_sim.py        # coin ekonomisi simülasyonu (§7.5)
 ```
 
 ### 10.2 BooloopCore
@@ -535,21 +667,46 @@ booloop/
 ### 10.3 Uygulama
 
 - Kayıt yerel (ilerleme, yıldız, coin, seri). Hesap yok, sunucu yok,
-  veritabanı yok. iCloud senkronu açık soru.
+  veritabanı yok.
+- **iCloud senkronu (Aşama 3, zorunlu).** Coin tüketilebilir ürün;
+  "geri yükle" onu geri getirmez. Senkron olmazsa telefonunu değiştiren
+  ödeme yapmış oyuncu coinlerini kaybeder; bu, tek yıldızlı yorumların
+  klasik sebebi. iCloud Key-Value Store yeter (sınır 1 MB ve 1.024
+  anahtar; kayıt birkaç KB). KVS "son yazan kazanır" diye çalıştığı için
+  birleştirme kuralları:
+  - yıldızlar ve açılan seviye: bölüm bölüm en büyük değer
+  - seri: oynanan günlerin birleşimi
+  - **coin bakiye olarak saklanmaz**; her cihaz kendi iki sayacını
+    tutar (toplam kazanılan, toplam harcanan). Bakiye = Σ kazanılan −
+    Σ harcanan. İki cihaz aynı anda yazsa da coin kaybolmaz.
+  - iCloud kapalıysa ayarlarda "İlerleme yalnızca bu cihazda" uyarısı
+    görünür.
 - Satın alma: StoreKit 2 ya da RevenueCat (Aşama 4'te karar). Reklamsız
   paket non-consumable olduğu için "Satın alımları geri yükle" düğmesi
   şart.
-- Reklam: bir aracılık SDK'sı (Aşama 4'te karar). Reklam SDK'sı takip
-  yapıyorsa ATT izni gerekir; izin ilk oturumda değil, FTUE bittikten
-  sonra istenir. Gizlilik manifesti ve gizlilik etiketi buna göre
-  doldurulur.
+- Reklam: bir aracılık SDK'sı (AdMob ya da AppLovin MAX; Aşama 4'te
+  karar). İzin akışı (GDPR mesajı, ATT, gizlilik seçenekleri) §12.4'te.
+- **Gizlilik manifesti** (Aşama 2, ilk TestFlight build'inden önce):
+  `PrivacyInfo.xcprivacy`. UserDefaults için gerekçe kodu `CA92.1`
+  (yalnızca uygulamanın kendi okuduğu veri). Gerekçesi beyan edilmemiş
+  API kullanan build App Store Connect'te reddedilir. SDK'lar kendi
+  manifestleriyle gelir: Google Mobile Ads ≥ 11.2.0, AppLovin ≥ 12.4.1.
+  Gizlilik etiketi SDK'ların beyanıyla birlikte doldurulur.
 - Çökme takibi: başlangıçta Xcode Organizer + MetricKit; gerekirse
   harici araç.
 - Lokalizasyon: tüm metinler en baştan string kataloğunda. İlk dil
   İngilizce; diğer diller Aşama 6'da.
-- Deployment target: **açık soru.** iOS 26 en yeni arayüz öğelerini
-  verir ama kitleyi daraltır. Oyun iOS 26'ya özel bir API'ye ihtiyaç
-  duymuyorsa daha eski bir sürüm seçilir.
+- **Deployment target: iOS 26.** Apple'ın 7 Haz 2026 verisine göre
+  bütün iPhone'ların %79'u, son dört yılın iPhone'larının %86'sı iOS
+  26'da; 2027 lansmanında oran daha yüksek olur. Game Center meydan
+  okumaları ve Games uygulaması iOS 26 ile geldi (§6.2.2). App Store
+  28 Nis 2026'dan beri Xcode 26 / iOS 26 SDK ile derleme istiyor;
+  Nisan 2027'de iOS 27 SDK şartı beklenir.
+- **Ekran:** tahta yerleşimi güvenli alanı (Dynamic Island, ana ekran
+  çubuğu) hesaba katar; en küçük ve en büyük iPhone'da test edilir.
+  120 Hz için Info.plist'te `CADisableMinimumFrameDurationOnPhone = YES`
+  ve `SKView.preferredFramesPerSecond = 120`; tahta hareketsizken 60'a
+  iner (pil).
 
 ### 10.4 Paylaşılan kontrol listesinin uyarlaması
 
@@ -575,10 +732,14 @@ booloop/
 
 ## 11. Aşamalar ve kapılar
 
-**Aşama 0 — İsim kilidi (bugün)**
+**Aşama 0 — İsim kilidi ve ön kontroller (bugün)**
 App Store Connect'te uygulama kaydı, alan adı, TikTok/Instagram/X
-kullanıcı adları, TÜRKPATENT ve TMview araması.
-*Kapı:* isim ayrıldı.
+kullanıcı adları, TÜRKPATENT ve TMview araması. Ayrıca:
+- Snacky Dash'te 20–30 bölüm oyna: gövde sırası teslimde önemli mi
+  (§1.1)?
+- Mali müşavirle hesap türü ve 20/B görüşmesi (§12.5).
+
+*Kapı:* isim ayrıldı ve fark doğrulandı.
 
 **Aşama 1 — Çekirdek**
 BooloopCore: kurallar, çözücü, çıkmaz tespiti, JSON yükleyici, altın
@@ -589,31 +750,51 @@ par'ı buluyor.
 **Aşama 2 — Oynanabilir dilim**
 SpriteKit sahnesi, kaydırma, kare kare kayma animasyonu, geri al, çıkmaz
 göstergesi, hamle sayacı ve hakkı, FTUE, ilk 40 seviye, geçici hayalet
-çizimleri.
+çizimleri, güvenli alan yerleşimi ve 120 Hz (§10.3),
+`PrivacyInfo.xcprivacy`.
 *Kapı:* 10 kişi, yüz yüze ilk oturum gözlemi. En az 8'i yardımsız 5.
 seviyeyi bitiriyor ve en az 6'sı kendiliğinden 10. seviyeye kadar oynayıp
 "bir daha" diyor. Hamle çarpanları ve çıkmaz göstergesi zamanlaması
 burada ayarlanır.
+*Kişiler:* oyunu hiç görmemiş, telefonda bulmaca oynayan yetişkinler
+(arkadaş ve aile çevresi); en az 3'ü sıralama/bulmaca oyunlarını
+düzenli oynuyor.
 
 **Aşama 3 — İçerik ve döngü**
 200 seviye, harita, yıldız, coin, güçlendiriciler, günlük gece,
-paylaşım kartı, bildirim, haptik, ses, son görsel dil.
+paylaşım kartı, bildirim, haptik, ses, son görsel dil, iCloud senkronu
+(§10.3), Game Center haftalık tablo ve meydan okuma (§6.2.2),
+erişilebilirlik (§9.2).
 *Kapı:* TestFlight'ta 10–20 kişi bir hafta oynuyor; en az yarısı üç ayrı
 günde açıyor.
+*Kişiler:* Aşama 2 grubu + TestFlight herkese açık bağlantısı (en fazla
+10.000 dış testçi): r/playmygame ve r/iosgaming beta konuları, Aşama
+0'dan beri ısınan TikTok hesabı. İlk dış build Beta App Review'dan
+geçer; 1–2 gün pay bırakılır.
 
 **Aşama 4 — Marka, gelir ve mağaza**
-Marka (§9.1), reklam ve satın alma entegrasyonu, analitik, gizlilik
-politikası, destek sayfası, mağaza varlıkları, inceleme notları (§12),
-ASO becerilerinin kurulumu (§12.3).
+Marka (§9.1), reklam ve satın alma entegrasyonu, reklam izni akışı
+(§12.4), analitik, gizlilik politikası ve destek sayfası (§12.4),
+mağaza varlıkları, mağaza metinlerinin yerelleştirilmesi (§12.1),
+inceleme notları (§12.2), yaş derecelendirme anketi, DSA tüccar beyanı
+ve yaş güvencesi kontrolü (§12.4), Small Business Program başvurusu
+(§12.5), lansman öne çıkarma başvurusu (§12.6), ASO becerilerinin
+kurulumu (§12.3).
 *Kapı:* Apple onayı.
 
 **Aşama 5 — Yumuşak lansman**
-Organik yayın + TikTok slayt ve kısa video içerikleri. 2–4 hafta ölçüm.
+Önce Kanada, Avustralya, Yeni Zelanda ve Birleşik Krallık: İngilizce
+konuşan, küçük, AB dışı pazarlar. AB dışı olduğu için DSA tüccar
+bilgilerinin AB ürün sayfasında yayımı AB'ye açılana kadar bekler;
+Birleşik Krallık yine de reklam izni ister (§12.4). ABD ve AB kapı
+geçilince açılır. Organik yayın + TikTok slayt ve kısa video
+içerikleri. 2–4 hafta ölçüm.
 *Kapı:* §8.2.
 
 **Aşama 6 — Büyüme**
-Yeni bölüm paketleri (üreteçle), sonsuz mod, kozmetikler, etkinlikler
-(Cadılar Bayramı), lokalizasyon, widget.
+Yeni bölüm paketleri (üreteçle), sonsuz mod, kozmetikler, uygulama içi
+etkinlikler (Cadılar Bayramı 2027, §12.6), oyun içi lokalizasyon,
+widget, müzik (§9), VoiceOver ve ekran yön düğmeleri (§9.2).
 
 *Zamanlama notu:* Cadılar Bayramı 2026 altı hafta uzakta. Aşama 1–4'ü
 buna sıkıştırmak kapıları atlamak demek. Bu yıl yalnızca içerik ve
@@ -636,9 +817,16 @@ kullanıcı adı ısınması için kullanılır; ilk Cadılar Bayramı etkinliğ
 - **Önizleme videosu:** 15–30 sn; bir bölümün tamamı ve bir çıkmaz + geri
   al anı.
 - Gizlilik politikası URL'si, destek URL'si, yaş derecesi, gizlilik
-  etiketleri.
-- Oyun çocuklar kategorisinde yer almaz. Sevimli görsel dil bunu
-  değiştirmez; reklam ağı ayarları buna göre yapılır.
+  etiketleri, erişilebilirlik etiketleri (§9.2).
+- **Mağaza metinleri Aşama 4'te yerelleştirilir**, oyun içi metinden
+  önce (en ucuz büyüme kaldıracı). Diller `keyword-research` ile seçilir.
+- **Çocuk kitlesi.** Oyun Kids kategorisinde yer almaz. Yönerge 2.3.8:
+  Kids dışındaki bir uygulama ad, ikon, ekran görüntüsü ve açıklamada
+  çocukların ana kitle olduğunu ima edemez; mağaza görselleri yetişkin
+  bulmaca oyuncusuna konuşur. Reklam ayarları: `maxAdContentRating` G
+  (en fazla PG); AdMob `ageRestrictedTreatment` belirtilmez, çünkü çocuk
+  hedef kitle değil. Yaş işareti aracılık yoluyla diğer ağlara
+  aktarılmadığı için aynı ayar her ağda ayrıca yapılır.
 
 ### 12.2 İnceleme notları (her gönderimde)
 
@@ -653,12 +841,15 @@ Paylaşılan listeden uyarlandı. İngilizce yazılır.
 3. **Özelliklere erişim:** "No account or login is required. All
    features are available from the home screen."
 4. **Dış servisler:** reklam aracılık SDK'sı, analitik, çökme raporu,
-   (varsa) RevenueCat. Hiçbiri kullanıcı hesabı oluşturmaz.
+   (varsa) RevenueCat, Game Center, iCloud Key-Value Store. Hiçbiri
+   kullanıcı hesabı oluşturmaz.
 5. **Bölgesel fark:** "The app works identically in all regions."
 6. **Lisanslar:** kullanılan font ve ses lisansları. Üçüncü taraf
    karakter ya da içerik yok.
 7. **Satın almalar:** her ürünün ne verdiği ve mağaza ekranına nasıl
    gidildiği (yazılı + kayıttaki zaman damgası).
+8. **İzin akışı:** GDPR mesajının (AB, Birleşik Krallık, İsviçre) ve
+   ATT'nin ne zaman çıktığı; Ayarlar > Gizlilik seçenekleri.
 
 ### 12.3 ASO araçları (aso-skills)
 
@@ -674,7 +865,7 @@ gerekiyor.
 |---|---|---|
 | `metadata-optimization` | Başlık, alt başlık, anahtar kelime alanı, açıklama — karakter sayılı varyantlar | §12.1'deki metinler elle yazıldı, test edilmedi |
 | `keyword-research` | Hacim × zorluk × alaka ile anahtar kelime seçimi | Aynı |
-| `app-store-featured` | Öne çıkarılma hazırlığı, pitch şablonu, uygulama içi etkinlik takvimi | BOSLUK-ANALIZI D2 |
+| `app-store-featured` | Öne çıkarılma hazırlığı, pitch şablonu, uygulama içi etkinlik takvimi | §12.6 |
 | `screenshot-optimization` | 10 kareli ekran görüntüsü stratejisi ve tasarım brifi | §9 görsel üretim yolu |
 | `app-rejection-recovery` | Reddedilmede Resolution Center yanıtı | §12.2'yi tamamlar |
 
@@ -700,6 +891,123 @@ listesiyle karşılaştırma), `app-icon-optimization`,
 - README'de kurulum komutu `eronred/aso-skills`, repo ise
   `appeeky/aso-skills`. Komut çalıştırılmadan doğrulanır.
 
+### 12.4 Yasal uyum
+
+Kaynaklar 18 Eyl 2026'da tarandı. Kurallar hızlı değişiyor; her madde
+Aşama 4'te Apple ve Google'ın kendi sayfasından yeniden okunur.
+
+**Reklam izni**
+- AB/AEA, Birleşik Krallık ve İsviçre'de kişiselleştirilmiş reklam için
+  Google sertifikalı, IAB TCF v2.2'ye entegre bir izin yönetim
+  platformu (CMP) gerekiyor (AEA ve BK 16 Oca 2024'ten, İsviçre 31 Tem
+  2024'ten beri). Yoksa yalnızca sınırlı ya da kişiselleştirilmemiş
+  reklam gelir; gelir düşer.
+- Google'ın UMP SDK'sı sertifikalı ve kullanılır. AppLovin MAX seçilirse
+  onun "Terms and Privacy Policy Flow" akışı da UMP'yi gösterir; GDPR
+  mesajı yine AdMob panelinde oluşturulur ve **aracılıktaki bütün ağlar**
+  mesajın ortak listesine eklenir, yoksa o ağ reklam vermeyebilir.
+- **Sıra:** önce GDPR mesajı; oyuncu onay verdiyse ATT. UMP'nin IDFA
+  açıklama ekranı ATT'den hemen önce çıkar. Info.plist'te
+  `NSUserTrackingUsageDescription`. İzin karşılığında ödül verilmez.
+- **Zaman:** FTUE (5. seviye) bittikten sonra, ilk reklam fırsatından
+  önce. `requestConsentInfoUpdate` her açılışta çağrılır; `canRequestAds`
+  false iken reklam istenmez ve önyüklenmez.
+- **Ayarlar > Gizlilik seçenekleri:** `privacyOptionsRequirementStatus`
+  "required" ise görünür ve izin formunu yeniden açar. GDPR'da izin her
+  an geri alınabilmeli.
+- **ABD eyaletleri:** UMP'nin "US state regulations" mesajı açılır
+  (satış/paylaşımdan çıkma, IAB GPP). Küçük bir uygulama yasal eşiklerin
+  altında kalabilir, ama açmanın maliyeti düşük.
+
+**Yaş derecelendirmesi (her gönderimde)**
+- Bantlar: 4+, 9+, 13+, 16+, 18+ (Tem 2025). Anket: uygulama içi
+  kontroller, yetenekler (sınırsız web, kullanıcı içeriği, mesajlaşma,
+  reklam), sağlık, şiddet, şans temelli etkinlikler.
+- **Booloop'un yanıtları:** reklam **var**. Kullanıcı içeriği,
+  mesajlaşma, sınırsız web **yok**. Sosyal medya (Eylül 2026'dan beri
+  her gönderimde zorunlu soru; tanımı "sosyal akışta kullanıcı içeriğini
+  dağıtma ya da onunla etkileşim") **yok**: paylaşım kartı sistemin
+  paylaşım sayfasıyla dışarı gider, uygulamada akış yok. Şans oyunu ve
+  ganimet kutusu **yok** (§7.4).
+- **Belirsiz:** Apple "yarışma"yı "sıralama ya da ödül için yarışmak"
+  diye tanımlıyor. Game Center lider tablosunun buna girip girmediğine
+  dair Apple yönlendirmesi bulunamadı. Aşama 4'te anketin o anki
+  metnine göre karar verilir. Beklenen derece 4+ ya da 9+.
+
+**Yaş güvencesi (ABD)**
+- Texas SB 2420 yürürlükte: Apple 4 Haz 2026'dan beri uyguluyor, ABD
+  Yüksek Mahkemesi 6 Tem 2026'da durdurma talebini reddetti. Alabama
+  1 Oca 2027, Utah 6 May 2027, Louisiana 1 Tem 2027.
+- Apple geliştiriciden Declared Age Range API'yi, "önemli değişiklik"
+  bildirimini, StoreKit'teki yaş derecesi alanını ve ebeveyn onayının
+  geri çekildiği sunucu bildirimlerini kullanmasını istiyor; yasanın
+  gerektirdiği yerde kullanıcının yaşını kontrol etmek zorunlu.
+- Hesapsız ya da 4+/9+ uygulamalar için resmi bir muafiyet bulunamadı.
+  Hukukçu özetlerine göre satın alma akışında Apple'ın yaş ve onay
+  sinyaline dayanmak yeterli görünüyor. **Doğrulanmadı;** Aşama 4'te
+  Apple'ın "age assurance" sayfası yeniden okunur, gerekirse hukuki
+  görüş alınır.
+
+**AB DSA tüccar statüsü**
+- Reklam ya da satın alma olan uygulama ticari sayılır. Bireysel
+  hesapta adres, telefon ve e-posta Apple tarafından doğrulanır ve 27 AB
+  ülkesindeki ürün sayfasında yayımlanır.
+- Posta kutusu, üzerine kayıtlı fatura ya da makbuzla kabul ediliyor.
+  Sanal ofis Apple'ın sayfasında geçmiyor; doğrulanmadı.
+- **Yapılacak:** AB'ye açılmadan önce iş telefonu ve posta kutusu.
+  Yumuşak lansman AB dışında (§11 Aşama 5).
+
+**Gizlilik politikası ve destek sayfası**
+- GitHub Pages'te barındırılır, Aşama 0'da alınan alan adına bağlanır.
+- İçerik: toplanan veri (§8.3 olay listesi, reklam SDK'ları), izni geri
+  alma yolu, iletişim e-postası, iCloud'da ne tutulduğu.
+
+### 12.5 Hesap türü ve vergi
+
+*Bilgi amaçlı; karar mali müşavirle verilir.*
+
+- **Ön karar: bireysel hesap + GVK mükerrer 20/B.** Booloop'ta şirket
+  hesabını zorlayan bir sebep yok. Apple'ın yönergesi (5.1.1(ix))
+  kumar gibi sıkı düzenlenen alanlarda tüzel kişi istiyor; Booloop'ta
+  şans unsuru yok. DSA iletişim bilgisi posta kutusuyla karşılanabiliyor.
+- **20/B:** bankadaki "özel hesap"a gelen ödemeden %15 stopaj kesilir,
+  nihai vergidir, beyanname verilmez. 2026 sınırı 5.300.000 TL (GVK 103.
+  madde 4. dilimin başı; Gelir Vergisi Genel Tebliği No. 332, RG
+  31.12.2025). Rakam muhasebe kaynaklarından; tebliğ metninden
+  doğrulanır.
+- Sınır aşılırsa o yılın gelirinin **tamamı** beyan edilir (en fazla
+  %40); kesilen %15 mahsup edilir.
+- Yalnızca gerçek kişi; şirket üzerinden elde edilen gelir kapsam dışı.
+- Sıra: önce vergi dairesinden istisna belgesi, sonra bankada özel
+  hesap; IBAN bir ay içinde vergi dairesine bildirilir.
+- **Açık:** reklam geliri kapsamda mı? Tebliğ 325 özetleri uygulama içi
+  reklamı sayıyor; bazı 2026 yorumları, ödeme mağaza üzerinden değil
+  doğrudan reklam ağından geldiği için dışarıda bırakıyor. Özelge ile
+  netleştirilir.
+- **Apple tarafı:** App Store Small Business Program'a başvuru (yıllık
+  1 milyon dolara kadar %15 komisyon; kendiliğinden gelmez). App Store
+  Connect'te W-8BEN; ABD–Türkiye anlaşmasında telif için kesinti %10,
+  form yoksa %30. App Store gelirinin telif mi ticari kazanç mı
+  sayıldığı doğrulanmadı.
+
+### 12.6 Öne çıkarılma ve etkinlik takvimi
+
+- **Featuring Nominations** (App Store Connect): Apple en az 2 hafta,
+  geniş değerlendirme için 3 aya kadar önceden başvuru öneriyor; App
+  Store Connect yardım sayfası en az 3 hafta diyor. Kural: en az 3
+  hafta önce.
+- **Uygulama içi etkinlik:** en fazla 31 gün sürer, başlamadan 14 gün
+  öncesine kadar tanıtılır. Aynı anda 10 yayında, 15 onaylı etkinlik
+  olabilir. Ürün sayfasında ve arama sonuçlarında görünür; uygulamayı
+  yüklemiş olanlar etkinlik kartını görür. Sürümden ayrı incelenir;
+  birkaç gün pay bırakılır.
+
+| Ne | Ne zaman |
+|---|---|
+| Lansman öne çıkarma başvurusu | Aşama 5'ten en az 3 hafta önce |
+| Her büyük güncelleme (yeni bölüm paketi) | Yayından en az 3 hafta önce başvuru |
+| Cadılar Bayramı 2027 etkinliği (en fazla 31 gün, 31 Eki'de biter) | Öne çıkarma başvurusu Temmuz 2027 sonu; etkinlik ekim başından önce incelemeye |
+
 ---
 
 ## 13. Reddedilenler
@@ -724,13 +1032,22 @@ listesiyle karşılaştırma), `app-icon-optimization`,
 
 1. Çıkmaz göstergesi: anında mı, bir hamle gecikmeli mi? (Aşama 2)
 2. Hamle hakkı çarpanları (Aşama 2 verisi)
-3. Deployment target (§10.3)
-4. StoreKit 2 mi RevenueCat mi? Hangi reklam aracılığı? (Aşama 4)
-5. Analitik aracı (Aşama 4)
-6. iCloud ile ilerleme senkronu
-7. Hayaletin adı ve karakter tasarımı (§9)
-8. İlk lokalizasyon dilleri (Aşama 6)
-9. Swift çözücünün cihazdaki gerçek süresi (Aşama 1)
-10. 9. ve 10. bölümde eğrinin alt seviyeleri için daha uzun üretim
-11. Geçiş reklamı kalsın mı? Dropward bunu reddetti; Booloop'ta sınırlı
-    tutuldu. Aşama 5'te D1/D7 ve yorumlara göre karar verilir.
+3. StoreKit 2 mi RevenueCat mi? AdMob mu AppLovin MAX mı? (Aşama 4)
+4. Analitik aracı (Aşama 4)
+5. Hayaletin adı, karakter tasarımı ve görsel üretim yolu (§9, §9.3)
+6. Oyun içi lokalizasyon dilleri (Aşama 6; mağaza metinleri Aşama 4'te)
+7. Swift çözücünün cihazdaki gerçek süresi (Aşama 1)
+8. 9. ve 10. bölümde eğrinin alt seviyeleri için daha uzun üretim
+9. Geçiş reklamı kalsın mı? Dropward bunu reddetti; Booloop'ta sınırlı
+   tutuldu. Aşama 5'te D1/D7 ve yorumlara göre karar verilir.
+10. Snacky Dash'te gövde sırası teslimde önemli mi? (Aşama 0, §1.1)
+11. Hesap türünün mali müşavirle onayı; 20/B reklam gelirini kapsıyor
+    mu? (Aşama 0, özelge; §12.5)
+12. Yaş anketinde Game Center lider tablosu "yarışma" sayılır mı?
+    (Aşama 4, §12.4)
+13. Coin ekonomisi fazla cömert mi? (§7.5; Aşama 5 verisi)
+14. "Haftanın gecesi" skor formülü (§6.2.2; Aşama 3)
+
+**18 Eyl'de kapananlar:** deployment target → iOS 26 (§10.3); iCloud
+senkronu → Aşama 3'te zorunlu (§10.3); günlük modun saat dilimi →
+yerel gece yarısı (§6.2.1).

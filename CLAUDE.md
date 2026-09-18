@@ -16,6 +16,7 @@ Tek kaynak `PLAN.md`. Kural orada yazmıyorsa oyunda yoktur.
   Kurallar (`slide`), çözücü, çıkmaz tespiti, JSON modeli.
 - `Booloop/`: SpriteKit sahnesi ve arayüz. Kural mantığı burada yazılmaz;
   sahne yalnızca `BooloopCore`'un döndürdüğü adımları çizer.
+- `tools/coin_sim.py`: coin ekonomisi simülasyonu (PLAN.md §7.5).
 - `tools/booloop_gen.py`: **altın referans.** Swift kuralı Python'dan
   farklı davranıyorsa hata Swift'tedir, ta ki PLAN.md değişene kadar.
 
@@ -47,6 +48,19 @@ python3 build_levels.py assemble
 Uzun bölümleri (8, 9) ayrı ayrı çalıştır. Üretim aynı tohumla
 tekrarlanabilir.
 
+## Uygulama kuralları (ayrıntı PLAN.md §10.3)
+
+- Tahta yerleşimi güvenli alana göre yapılır (Dynamic Island, ana ekran
+  çubuğu). Dropward'da bu hata geç bulundu.
+- 120 Hz: Info.plist'te `CADisableMinimumFrameDurationOnPhone = YES`,
+  `SKView.preferredFramesPerSecond = 120`, hareketsizken 60.
+- `PrivacyInfo.xcprivacy` ilk TestFlight build'inden önce var;
+  UserDefaults gerekçesi `CA92.1`. Yeni bir gerekçe-gerektiren API ya da
+  SDK eklenince manifest aynı PR'da güncellenir.
+- Coin bakiye olarak saklanmaz; cihaz başına kazanılan/harcanan
+  sayaçları (PLAN.md §10.3).
+- Reklam, `canRequestAds` true olmadan istenmez ve önyüklenmez.
+
 ## Git
 
 Her iş ayrı dalda, ayrı PR. `main` her zaman derlenir ve testleri geçer.
@@ -56,3 +70,15 @@ yer almaz. `Co-Authored-By: Claude ...` satırı eklenmez; commit
 mesajına ve PR açıklamasına "Generated with Claude Code" veya benzeri
 bir imza yazılmaz. Commit'ler yalnızca depo sahibinin git kimliğiyle
 atılır; `git config user.name` / `user.email` değiştirilmez.
+
+**Git yazma işlemleri Mac terminalinden** (commit, push, pull, rebase).
+Xcode MCP köprüsü ve Cowork ortamı `.git/*.lock` dosyaları
+bırakabiliyor; Cowork ortamından GitHub'a erişim de yok. Kilit kalırsa
+hiçbir git süreci çalışmadığından emin olunduktan sonra silinir.
+
+## Ortam
+
+- Xcode → Settings → Intelligence'ta MCP açılmadan Xcode köprüsü
+  bağlanmaz.
+- Xcode lisansı kabul edilmemişse Mac'teki `git` de çalışmaz:
+  `sudo xcodebuild -license accept`.
