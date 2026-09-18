@@ -1,0 +1,38 @@
+# macOS
+.DS_Store
+
+# Xcode
+build/
+DerivedData/
+*.xcuserstate
+*.xcworkspace/xcuserdata/
+*.xcodeproj/xcuserdata/
+*.xcodeproj/project.xcworkspace/xcuserdata/
+*.moved-aside
+*.hmap
+*.ipa
+*.dSYM.zip
+*.dSYM
+
+# Swift Package Manager
+.build/
+.swiftpm/
+Packages/*/.build/
+
+# Python (tools/)
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Üreteç ara çıktıları
+tools/part-*.json
+tools/rep-*.json
+tools/*.log
+
+# Gizli bilgiler
+*.p8
+*.p12
+*.mobileprovision
+secrets.json
+.env
