@@ -45,8 +45,17 @@ final class GameSession {
 
     var canUndo: Bool { !history.isEmpty && !isOver }
 
-    /// Göstergenin şu an yanıp yanmadığı; zamanlama geliştirici ayarından gelir.
-    var showsDeadEnd: Bool { deadEndTiming == .immediate ? deadNow : deadPrev }
+    /// FTUE'de geri al'ı öğreten seviye (§5). Burada gösterge geliştirici ayarından bağımsız
+    /// olarak her zaman anında gelir; el geri al'ı ancak gösterge yandıktan sonra gösterebilir.
+    static let ftueUndoLevel = 4
+
+    /// Uygulanan zamanlama: FTUE geri al seviyesinde anında, diğerlerinde geliştirici ayarı.
+    var effectiveDeadEndTiming: DeadEndTiming {
+        entry.id == Self.ftueUndoLevel ? .immediate : deadEndTiming
+    }
+
+    /// Göstergenin şu an yanıp yanmadığı.
+    var showsDeadEnd: Bool { effectiveDeadEndTiming == .immediate ? deadNow : deadPrev }
 
     /// §2.9. Aşama 2'de güçlendirici olmadığı için 3 yıldız mümkündür.
     var stars: Int {

@@ -193,7 +193,7 @@ final class GameViewController: UIViewController {
         } else if session.isFailed {
             Haptics.failure()
             showOverlay(won: false)
-        } else if session.showsDeadEnd, levelNumber == 4, !undoHandShown {
+        } else if session.showsDeadEnd, levelNumber == GameSession.ftueUndoLevel, !undoHandShown {
             undoHandShown = true   // §5: 4. seviyede el geri al'ı gösterir
             showUndoHand()
         }

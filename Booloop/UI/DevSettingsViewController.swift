@@ -42,6 +42,7 @@ final class DevSettingsViewController: UITableViewController {
 
     override func tableView(_ tableView: UITableView, titleForFooterInSection section: Int) -> String? {
         switch section {
+        case 0: return "FTUE 4. seviyede her zaman anında (§5)."
         case 1: return "Sonraki seviyeden itibaren geçerli. Hak her zaman ≥ par."
         default: return nil
         }

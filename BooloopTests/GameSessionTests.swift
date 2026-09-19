@@ -13,8 +13,9 @@ final class GameSessionTests: XCTestCase {
     }
 
     /// İlk hamlesi çıkmaza götüren, çıkmazdan sonra da en az bir geçerli hamlesi olan bir seviye.
+    /// FTUE geri al seviyesi zamanlama ayarını yok saydığı için atlanır.
     private func deadFirstMove() -> (LevelPack.Entry, Direction)? {
-        for entry in LevelCatalog.adventure {
+        for entry in LevelCatalog.adventure where entry.id != GameSession.ftueUndoLevel {
             let solver = Solver(level: entry.level)
             for direction in Direction.allCases {
                 guard let after = entry.level.slide(entry.level.start, direction),
@@ -77,6 +78,22 @@ final class GameSessionTests: XCTestCase {
         XCTAssertTrue(session.showsDeadEnd, "gecikmeli gösterge bir hamle sonra yanar")
         XCTAssertTrue(session.undo())
         XCTAssertFalse(session.showsDeadEnd)
+        XCTAssertTrue(session.undo())
+        XCTAssertFalse(session.showsDeadEnd)
+    }
+
+    func testFTUEUndoLevelIgnoresDelayedSetting() throws {
+        let entry = LevelCatalog.entry(GameSession.ftueUndoLevel)
+        let solver = Solver(level: entry.level)
+        let direction = try XCTUnwrap(Direction.allCases.first { d in
+            entry.level.slide(entry.level.start, d).map { solver.solve(from: $0) == .dead } ?? false
+        }, "FTUE 4. seviyede çıkmaza götüren ilk hamle bekleniyordu (§5)")
+        let settings = freshSettings()
+        settings.deadEndTiming = .delayed
+        let session = GameSession(entry: entry, settings: settings)
+        XCTAssertEqual(session.effectiveDeadEndTiming, .immediate)
+        XCTAssertNotNil(session.swipe(direction))
+        XCTAssertTrue(session.showsDeadEnd, "FTUE 4. seviyede gösterge ayardan bağımsız anında yanar")
         XCTAssertTrue(session.undo())
         XCTAssertFalse(session.showsDeadEnd)
     }
