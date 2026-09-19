@@ -8,6 +8,11 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let window = UIWindow(windowScene: windowScene)
         let nav = UINavigationController(rootViewController: LevelListViewController())
         nav.isNavigationBarHidden = true
+        #if DEBUG
+        // Simülatörde yerleşim kontrolü için: `-BooloopOpenLevel N` doğrudan N. seviyeyi açar.
+        let openLevel = UserDefaults.standard.integer(forKey: "BooloopOpenLevel")
+        if openLevel > 0 { nav.pushViewController(GameViewController(levelNumber: openLevel), animated: false) }
+        #endif
         window.rootViewController = nav
         window.overrideUserInterfaceStyle = .dark
         self.window = window
