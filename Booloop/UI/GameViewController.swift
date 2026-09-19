@@ -24,6 +24,12 @@ final class GameViewController: UIViewController {
     private let hand = HandView()
     private var overlay: UIView?
     private var undoHandShown = false
+    /// Test oturumu kaydı (§8.3); oturum yoksa hiçbir şey yazmaz. Görünüm yüklenmeden önce ayarlanır.
+    var recorder: TestRecorder = .shared
+    /// Seviye denemesi (başlangıç ya da tekrar) başladığı an ve o denemedeki çıkmaz sayısı.
+    private var attemptStarted = Date()
+    private var deadendCount = 0
+    private var deadendVisible = false
     private let reduceMotion = UIAccessibility.isReduceMotionEnabled
 
     init(levelNumber: Int) {
@@ -46,6 +52,7 @@ final class GameViewController: UIViewController {
         buildScene()
         installGestures()
         refreshHUD()
+        beginAttempt()
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -172,6 +179,8 @@ final class GameViewController: UIViewController {
         guard !scene.isAnimating, overlay == nil else { return false }
         hand.hide()
         guard let result = session.swipe(direction) else {
+            recorder.record(.init(name: .invalidSwipe, level: levelNumber,
+                                  moveIndex: session.movesUsed, direction: String(describing: direction)))
             scene.shake(direction)   // §2.2: geçersiz kaydırma, hamle sayılmaz
             Haptics.invalid()
             return false
@@ -187,16 +196,41 @@ final class GameViewController: UIViewController {
         skView.preferredFramesPerSecond = 60
         refreshHUD()
         if session.isWon {
+            recorder.record(.init(name: .levelComplete, level: levelNumber, moves: session.movesUsed,
+                                  par: session.entry.par, stars: session.stars, undoCount: session.undoCount,
+                                  deadendCount: deadendCount, seconds: recorder.now.timeIntervalSince(attemptStarted)))
             Haptics.success()
             Progress.shared.complete(levelNumber, stars: session.stars)
             showOverlay(won: true)
         } else if session.isFailed {
+            recorder.record(.init(name: .levelFail, level: levelNumber, moves: session.movesUsed))
             Haptics.failure()
             showOverlay(won: false)
-        } else if session.showsDeadEnd, levelNumber == GameSession.ftueUndoLevel, !undoHandShown {
-            undoHandShown = true   // §5: 4. seviyede el geri al'ı gösterir
-            showUndoHand()
+        } else {
+            noteDeadEnd()
+            if session.showsDeadEnd, levelNumber == GameSession.ftueUndoLevel, !undoHandShown {
+                undoHandShown = true   // §5: 4. seviyede el geri al'ı gösterir
+                showUndoHand()
+            }
         }
+    }
+
+    /// Yeni deneme: `level_start` yazılır, süre ve çıkmaz sayacı sıfırlanır.
+    private func beginAttempt() {
+        attemptStarted = recorder.now
+        deadendCount = 0
+        deadendVisible = false
+        recorder.record(.init(name: .levelStart, level: levelNumber))
+    }
+
+    /// Gösterge sönükten yanığa geçtiyse `deadend_shown` yazılır ve sayılır.
+    private func noteDeadEnd() {
+        let dead = session.showsDeadEnd
+        if dead && !deadendVisible {
+            deadendCount += 1
+            recorder.record(.init(name: .deadendShown, level: levelNumber, moveIndex: session.movesUsed))
+        }
+        deadendVisible = dead
     }
 
     @objc private func undoTapped() { undo() }
@@ -208,6 +242,7 @@ final class GameViewController: UIViewController {
         hand.hide()
         scene.snap(to: session.state)
         refreshHUD()
+        noteDeadEnd()
         return true
     }
 
@@ -217,6 +252,7 @@ final class GameViewController: UIViewController {
         dismissOverlay()
         scene.snap(to: session.state)
         refreshHUD()
+        beginAttempt()
     }
 
     func goToNextLevel() {

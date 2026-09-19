@@ -551,6 +551,23 @@ tablosu açıkta yok; dolaşımdaki tür tabloları 2022 verisine dayanıyor.
 Kişisel veri yok. Analitik aracı Aşama 4'te seçilir (gizlilik dostu bir
 araç ya da Mixpanel).
 
+**Aşama 2 test oturumu kaydı.** Analitik aracı seçilene kadar yüz yüze
+testler cihazda kaydedilir. Geliştirici ayarlarındaki "Test oturumu"
+testçi numarası ve tarihle yeni bir oturum açar, ilerlemeyi sıfırlar ve
+1. seviyeyi başlatır. Oturum sürerken şu olaylar oturum başına bir JSON
+dosyasına yazılır:
+
+- `level_start`
+- `level_complete(moves, par, stars, undo_count, deadend_count, seconds)`
+- `level_fail(moves)`
+- `deadend_shown(move_index)`
+- `invalid_swipe(move_index, direction)`
+
+Her olayda sıra numarası, saat ve oturum başından geçen süre de bulunur.
+Ağ ve üçüncü taraf SDK yoktur. Normal oyunda hiçbir şey yazılmaz. Oturum
+CSV + JSON olarak paylaşım sayfasıyla (AirDrop) dışa aktarılır. Eski
+oturumlar silinmez.
+
 ---
 
 ## 9. Tema, görsel dil, ses
