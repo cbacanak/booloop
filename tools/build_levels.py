@@ -4,7 +4,7 @@ Booloop macera bölümlerini üretir ve doğrular.
 Kullanım (her bölüm ayrı çalıştırılabilir; uzun bölümler için önerilir):
     python3 build_levels.py chapter 0 50        # 1. bölüm, 50 sn üretim süresi
     python3 build_levels.py chapter 8 150       # 9. bölüm
-    python3 build_levels.py assemble            # part-*.json -> levels-200.json + doğrulama
+    python3 build_levels.py assemble            # part-*.json -> ../data/levels-200.json + doğrulama
 
 Elle seçilen seviyeler LOCKED listesindedir: `chapter` onları üretmez, depodaki
 data/levels-200.json'dan alır ve güncel kurallarla yeniden doğrular. O yuvanın üretimi yine
@@ -12,7 +12,7 @@ yapılıp atılır; böylece bir seviyeyi kilitlemek bölümün diğer seviyeler
 
 Kurallar PLAN.md §2'de. Bu dosya ve booloop_gen.py Swift çekirdeğinin altın referansıdır.
 """
-import sys, json, hashlib, random, collections, time
+import sys, os, json, hashlib, random, collections, time
 from booloop_gen import Level, analyze, accept, rand_level, difficulty, sig, slide, won
 
 TUT = [  # 1. bölümün ilk 5 seviyesi (öğretici)
@@ -28,7 +28,8 @@ LOCKED = {
     4: "FTUE çıkmaz + geri al (level4_candidates.py)",
     5: "FTUE sıra önemli (level5_candidates.py)",
 }
-DATA = '../data/levels-200.json'
+HERE = os.path.dirname(os.path.abspath(__file__))
+DATA = os.path.join(HERE, '..', 'data', 'levels-200.json')
 
 CH = [
  dict(name="1 Uyanış",      W=5,H=6,colors=2,walls=(2,4),par=(3,6),need_trap=False,max_opt=20,mult=None),
@@ -119,13 +120,13 @@ def build_chapter(ci, seconds):
                         diff=r['diff'], solution=r['solution'], intro=(i == 0 and 'feats' in cfg)))
     rep = dict(chapter=cfg['name'], tries=tries, pars=[l['par'] for l in out],
                dead=round(sum(l['dead'] for l in out)/len(out), 2), locked=sorted(locked))
-    json.dump(out, open(f'part-{ci}.json','w'), ensure_ascii=False)
-    json.dump([rep], open(f'rep-{ci}.json','w'), ensure_ascii=False)
+    json.dump(out, open(os.path.join(HERE, f'part-{ci}.json'),'w'), ensure_ascii=False)
+    json.dump([rep], open(os.path.join(HERE, f'rep-{ci}.json'),'w'), ensure_ascii=False)
     print(rep)
 
-def assemble(path='levels-200.json'):
+def assemble(path=DATA):
     levels = []
-    for i in range(len(CH)): levels += json.load(open(f'part-{i}.json'))
+    for i in range(len(CH)): levels += json.load(open(os.path.join(HERE, f'part-{i}.json')))
     hashes = set()
     for n, l in enumerate(levels, 1):
         l['id'] = n
@@ -142,7 +143,7 @@ def assemble(path='levels-200.json'):
                 lantern="[x,y,color,capacity]", wisp="[x,y,color]",
                 gate="[x,y,lanternIndex]", arrow="[x,y,direction]")
     json.dump(dict(meta=meta, levels=levels), open(path,'w'), ensure_ascii=False, separators=(',',':'))
-    print(f"{len(levels)} bölüm doğrulandı -> {path}")
+    print(f"{len(levels)} bölüm doğrulandı -> {os.path.relpath(path, os.path.join(HERE, '..'))}")
 
 if __name__ == '__main__':
     if sys.argv[1] == 'chapter': build_chapter(int(sys.argv[2]), float(sys.argv[3]))

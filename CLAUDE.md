@@ -52,9 +52,13 @@ Yayınlanmış bölümler varsa kural değişikliği yalnızca yeni
 
 ```
 cd tools
-python3 build_levels.py chapter <0-9> <saniye>
-python3 build_levels.py assemble
+python3 build_levels.py chapter <0-9> <saniye>   # -> tools/part-<n>.json
+python3 build_levels.py assemble                 # -> data/levels-200.json + doğrulama
+python3 make_slide_golden.py                     # kayma altın verisi yenilenir
 ```
+
+`assemble` doğrudan `data/levels-200.json`'a yazar; ara dosya yoktur.
+On bölümün `part-*.json` dosyası da yerelde olmalıdır.
 
 Uzun bölümleri (8, 9) ayrı ayrı çalıştır. Üretim aynı tohumla
 tekrarlanabilir.

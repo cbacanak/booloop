@@ -26,7 +26,7 @@ ortalama 7,7.
 ```
 cd tools
 python3 build_levels.py chapter <0-9> <saniye>   # tek bölüm üret
-python3 build_levels.py assemble                 # birleştir + doğrula
+python3 build_levels.py assemble                 # birleştir + doğrula -> data/levels-200.json
 ```
 
 `tools/booloop_gen.py` kuralların **altın referansı.** Swift çekirdeği
