@@ -242,9 +242,14 @@ seviyesi öğretici ayardan gelir (4×5 tahta, par 1–3).
 **200/200 kazanıyor, 200/200 benzersiz, hamle hakkı her yerde ≥ par.**
 Veri 62 KB.
 
+19 Eyl 2026: FTUE 4. ve 5. seviye elle seçildi (§5) ve kilitlendi.
+200 bölüm yeniden doğrulandı; sonuç aynı, Python çözücü de her bölümde
+kayıtlı par'ı buluyor. Değişen tek sayı 1. bölümün ortalama çıkmaz oranı:
+%53 → %51.
+
 | Bölüm | Par | Ortalama çıkmaz | Deneme | Süre (Python) |
 |---|---|---|---|---|
-| 1 Uyanış | 1–6 | %53 | 972 | 0,4 sn |
+| 1 Uyanış | 1–6 | %51 | 972 | 0,4 sn |
 | 2 Üç renk | 4–8 | %71 | 5.163 | 4 sn |
 | 3 Örümcek ağı | 4–9 | %69 | 11.335 | 16 sn |
 | 4 Geniş gece | 5–10 | %67 | 4.848 | 6 sn |
