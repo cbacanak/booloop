@@ -146,7 +146,8 @@ oyunda oyuncu çoktan kaybettiği bir bölümü dakikalarca oynar; bu,
 
 *Açık soru:* gösterge anında mı gelsin, yoksa bir hamle gecikmeli mi?
 Anında olursa deneme-yanılma ucuzlar ama hamle hakkı bunun bedelini zaten
-aldırıyor. Aşama 2'de ikisi de denenecek.
+aldırıyor. Aşama 2'de ikisi de denenecek. Bu soru FTUE 4. seviyeyi
+kapsamaz: orada gösterge her zaman anında gelir (§5).
 
 Çözücü belirlenen sınır içinde sonuca varamazsa gösterge hiçbir şey
 göstermez. Emin olmadığı zaman konuşmaz.
@@ -301,12 +302,21 @@ Metin yok. Yalnızca el işareti animasyonu ve tahta.
 | 1 (par 1) | Kaydırma, toplama, bırakma | El kaydırmayı gösterir; tek kaydırmada ruh toplanır ve fenere girer |
 | 2 (par 2) | Kayma engelde durur | El yok |
 | 3 (par 2) | İki renk | El yok |
-| 4 (par 3) | Sıra önemli, çıkmaz, geri al | İlk doğal hamle çıkmaza götürür, fenerler söner, el geri al'ı gösterir |
-| 5 (par 3–4) | Kendi başına | El yok |
+| 4 (par 3) | Çıkmaz, geri al | İlk doğal hamle çıkmaza götürür, fenerler söner, el geri al'ı gösterir |
+| 5 (par 3–4) | Sıra önemli: ilk toplanan ilk bırakılır | El yok. Gövdede iki ruh taşınır; ters sırayla toplanırsa çıkmaz |
 
-4. seviye özel seçilir: ilk hamlelerden en az biri çıkmaz olmalı ve o
-hamle "en doğal" görünen olmalı. Aday havuzundan elle seçilir, sonra
-değişmez.
+4. ve 5. seviye özel seçilir: aday havuzundan elle seçilir, sonra
+değişmez (`tools/level4_candidates.py`, `tools/level5_candidates.py`).
+
+- **4. seviye:** ilk hamlelerden en az biri çıkmaz olmalı ve o hamle
+  "en doğal" görünen olmalı. Çıkmaz göstergesi burada geliştirici
+  ayarından bağımsız olarak her zaman anında gelir (§2.8); el geri al'ı
+  ancak gösterge yandıktan sonra gösterebilir.
+- **5. seviye:** çözümde bir hamle sonunda gövdede iki ruh bulunur ve
+  kuyruk ucundaki ruh önce kendi fenerine gider. Gövdede en fazla bir
+  ruh taşıyarak kazanmak mümkün değildir, yani ders atlanamaz. İki ruh
+  ters sırayla taşınırsa durum çıkmazdır ve ters sıra par hamle içinde
+  kurulabilir. Tahta 4×5, iki renk.
 
 Hamle sayacı ve yıldızlar 6. seviyeden itibaren görünür. Hamle hakkı 2.
 bölümde başlar.
@@ -1040,7 +1050,7 @@ Aşama 4'te Apple ve Google'ın kendi sayfasından yeniden okunur.
 
 ## 14. Açık sorular
 
-1. Çıkmaz göstergesi: anında mı, bir hamle gecikmeli mi? (Aşama 2)
+1. Çıkmaz göstergesi: anında mı, bir hamle gecikmeli mi? (Aşama 2; FTUE 4. seviye her zaman anında, §5)
 2. Hamle hakkı çarpanları (Aşama 2 verisi)
 3. StoreKit 2 mi RevenueCat mi? AdMob mu AppLovin MAX mı? (Aşama 4)
 4. Analitik aracı (Aşama 4)
