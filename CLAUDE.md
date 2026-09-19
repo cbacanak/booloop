@@ -59,6 +59,15 @@ python3 build_levels.py assemble
 Uzun bölümleri (8, 9) ayrı ayrı çalıştır. Üretim aynı tohumla
 tekrarlanabilir.
 
+**Elle seçilen seviyeler kilitlidir.** `build_levels.py` içindeki
+`LOCKED` listesindeki kimlikler (şu an FTUE 4 ve 5) üretilmez.
+`chapter` bunları `data/levels-200.json`'dan alır ve güncel kurallarla
+yeniden doğrular; kurallar değişip seviye artık aynı par'la çözülmüyorsa
+üretim durur. Bir seviye elle seçilince (`level4_candidates.py apply`,
+`level5_candidates.py apply` vb.) kimliği aynı PR'da `LOCKED`'a eklenir.
+Kilitli yuvanın üretimi yine yapılıp atılır; kilit eklemek bölümün diğer
+seviyelerini değiştirmez.
+
 ## Uygulama kuralları (ayrıntı PLAN.md §10.3)
 
 - Tahta yerleşimi güvenli alana göre yapılır (Dynamic Island, ana ekran
