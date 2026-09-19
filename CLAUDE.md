@@ -16,6 +16,11 @@ Tek kaynak `PLAN.md`. Kural orada yazmıyorsa oyunda yoktur.
   Kurallar (`slide`), çözücü, çıkmaz tespiti, JSON modeli.
 - `Booloop/`: SpriteKit sahnesi ve arayüz. Kural mantığı burada yazılmaz;
   sahne yalnızca `BooloopCore`'un döndürdüğü adımları çizer.
+- `project.yml`: Xcode projesinin tek kaynağı (XcodeGen). `Booloop.xcodeproj`
+  `xcodegen generate` ile üretilir, depoya girmez. Hedef ya da dosya
+  eklemek için `.xcodeproj` değil `project.yml` düzenlenir.
+- `BooloopTests/`: uygulama testleri (simülatör). İlk 40 seviyenin çözümü
+  sahne üzerinden oynatılır; hamle hakkı çarpanları Python ile karşılaştırılır.
 - `tools/coin_sim.py`: coin ekonomisi simülasyonu (PLAN.md §7.5).
 - `tools/booloop_gen.py`: **altın referans.** Swift kuralı Python'dan
   farklı davranıyorsa hata Swift'tedir, ta ki PLAN.md değişene kadar.
@@ -35,6 +40,8 @@ Yayınlanmış bölümler varsa kural değişikliği yalnızca yeni
 
 - `swift test` (Packages/BooloopCore) simülatörsüz koşar ve her PR'da
   yeşil olmalı.
+- Uygulama testleri: `xcodegen generate`, sonra Xcode'da ⌘U ya da
+  `xcodebuild test -scheme Booloop -destination 'platform=iOS Simulator,name=iPhone 17'`.
 - Altın test: `data/levels-200.json` içindeki 200 çözüm yeniden oynatılır
   ve Swift çözücü aynı par'ı bulur.
 - Kayma altın testi: `Tests/BooloopCoreTests/Fixtures/slide-golden.json`
@@ -45,12 +52,25 @@ Yayınlanmış bölümler varsa kural değişikliği yalnızca yeni
 
 ```
 cd tools
-python3 build_levels.py chapter <0-9> <saniye>
-python3 build_levels.py assemble
+python3 build_levels.py chapter <0-9> <saniye>   # -> tools/part-<n>.json
+python3 build_levels.py assemble                 # -> data/levels-200.json + doğrulama
+python3 make_slide_golden.py                     # kayma altın verisi yenilenir
 ```
+
+`assemble` doğrudan `data/levels-200.json`'a yazar; ara dosya yoktur.
+On bölümün `part-*.json` dosyası da yerelde olmalıdır.
 
 Uzun bölümleri (8, 9) ayrı ayrı çalıştır. Üretim aynı tohumla
 tekrarlanabilir.
+
+**Elle seçilen seviyeler kilitlidir.** `build_levels.py` içindeki
+`LOCKED` listesindeki kimlikler (şu an FTUE 4 ve 5) üretilmez.
+`chapter` bunları `data/levels-200.json`'dan alır ve güncel kurallarla
+yeniden doğrular; kurallar değişip seviye artık aynı par'la çözülmüyorsa
+üretim durur. Bir seviye elle seçilince (`level4_candidates.py apply`,
+`level5_candidates.py apply` vb.) kimliği aynı PR'da `LOCKED`'a eklenir.
+Kilitli yuvanın üretimi yine yapılıp atılır; kilit eklemek bölümün diğer
+seviyelerini değiştirmez.
 
 ## Uygulama kuralları (ayrıntı PLAN.md §10.3)
 

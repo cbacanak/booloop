@@ -36,3 +36,6 @@ tools/*.log
 *.mobileprovision
 secrets.json
 .env
+
+# XcodeGen çıktısı (tek kaynak project.yml)
+Booloop.xcodeproj/

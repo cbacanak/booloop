@@ -4,11 +4,15 @@ Booloop macera bölümlerini üretir ve doğrular.
 Kullanım (her bölüm ayrı çalıştırılabilir; uzun bölümler için önerilir):
     python3 build_levels.py chapter 0 50        # 1. bölüm, 50 sn üretim süresi
     python3 build_levels.py chapter 8 150       # 9. bölüm
-    python3 build_levels.py assemble            # part-*.json -> levels-200.json + doğrulama
+    python3 build_levels.py assemble            # part-*.json -> ../data/levels-200.json + doğrulama
+
+Elle seçilen seviyeler LOCKED listesindedir: `chapter` onları üretmez, depodaki
+data/levels-200.json'dan alır ve güncel kurallarla yeniden doğrular. O yuvanın üretimi yine
+yapılıp atılır; böylece bir seviyeyi kilitlemek bölümün diğer seviyelerini değiştirmez.
 
 Kurallar PLAN.md §2'de. Bu dosya ve booloop_gen.py Swift çekirdeğinin altın referansıdır.
 """
-import sys, json, hashlib, random, collections, time
+import sys, os, json, hashlib, random, collections, time
 from booloop_gen import Level, analyze, accept, rand_level, difficulty, sig, slide, won
 
 TUT = [  # 1. bölümün ilk 5 seviyesi (öğretici)
@@ -16,8 +20,17 @@ TUT = [  # 1. bölümün ilk 5 seviyesi (öğretici)
     dict(W=4,H=5,colors=1,walls=(1,2),par=(2,2),need_trap=False),
     dict(W=4,H=5,colors=2,walls=(1,2),par=(2,2),need_trap=False),
     dict(W=4,H=5,colors=2,walls=(1,3),par=(3,3),need_trap=False),
-    dict(W=5,H=5,colors=2,walls=(1,3),par=(3,4),need_trap=False),
+    dict(W=4,H=5,colors=2,walls=(1,3),par=(3,4),need_trap=False),
 ]
+# Elle seçilen seviyeler (kimlik -> neden). Üretim bunların üzerine yazmaz (PLAN.md §5).
+# Yeni bir seviye elle seçilince `apply` sonrası kimliği buraya eklenir.
+LOCKED = {
+    4: "FTUE çıkmaz + geri al (level4_candidates.py)",
+    5: "FTUE sıra önemli (level5_candidates.py)",
+}
+HERE = os.path.dirname(os.path.abspath(__file__))
+DATA = os.path.join(HERE, '..', 'data', 'levels-200.json')
+
 CH = [
  dict(name="1 Uyanış",      W=5,H=6,colors=2,walls=(2,4),par=(3,6),need_trap=False,max_opt=20,mult=None),
  dict(name="2 Üç renk",     W=5,H=7,colors=3,walls=(2,5),par=(4,8),mult=2.0),
@@ -77,8 +90,21 @@ def take(pool, par):
             g.sort(key=lambda x: x[1]['diff']); return g.pop(len(g)//2)
     return None
 
+def locked_entry(n):
+    """Kilitli seviye: depodaki veriden alınır, güncel kurallarla yeniden doğrulanır."""
+    e = next(l for l in json.load(open(DATA))['levels'] if l['id'] == n)
+    L = from_json(e['level']); s = L.start()
+    for d in e['solution']:
+        s = slide(L, s, d); assert s is not None, n
+    assert won(L, s) and len(e['solution']) == e['par'], n
+    r = analyze(L, limit=e['par'], cap=200000)
+    assert r and r['par'] == e['par'], f"kilitli seviye {n}: güncel kurallarla par {r and r['par']} != {e['par']}"
+    return {k: v for k, v in e.items() if k != 'id'}
+
 def build_chapter(ci, seconds):
     cfg = CH[ci]; rng = random.Random(2026+ci); seen = set(); out = []
+    locked = {n: locked_entry(n) for n in LOCKED if ci*20 < n <= ci*20+20}
+    for e in locked.values(): seen.add(sig(from_json(e['level'])))
     pool, tries = gen_pool(cfg, rng, seen, 160, seconds, cfg.get('feats', ()))
     for i, p in enumerate(targets(*cfg['par'])):
         if ci == 0 and i < 5:
@@ -87,18 +113,20 @@ def build_chapter(ci, seconds):
             x = take(pool, p) or take(pool, cfg['par'][1]) or take(pool, cfg['par'][0])
         if x is None: raise SystemExit(f"{cfg['name']}: aday bitti, süreyi artır")
         L, r = x
+        if ci*20+i+1 in locked:                # yuva kilitli: üretilen atılır
+            out.append(locked[ci*20+i+1]); continue
         out.append(dict(chapter=cfg['name'], level=L.to_json(), par=r['par'],
                         moves=move_budget(r['par'], cfg.get('mult')), opt=r['opt'], dead=r['dead'],
                         diff=r['diff'], solution=r['solution'], intro=(i == 0 and 'feats' in cfg)))
     rep = dict(chapter=cfg['name'], tries=tries, pars=[l['par'] for l in out],
-               dead=round(sum(l['dead'] for l in out)/len(out), 2))
-    json.dump(out, open(f'part-{ci}.json','w'), ensure_ascii=False)
-    json.dump([rep], open(f'rep-{ci}.json','w'), ensure_ascii=False)
+               dead=round(sum(l['dead'] for l in out)/len(out), 2), locked=sorted(locked))
+    json.dump(out, open(os.path.join(HERE, f'part-{ci}.json'),'w'), ensure_ascii=False)
+    json.dump([rep], open(os.path.join(HERE, f'rep-{ci}.json'),'w'), ensure_ascii=False)
     print(rep)
 
-def assemble(path='levels-200.json'):
+def assemble(path=DATA):
     levels = []
-    for i in range(len(CH)): levels += json.load(open(f'part-{i}.json'))
+    for i in range(len(CH)): levels += json.load(open(os.path.join(HERE, f'part-{i}.json')))
     hashes = set()
     for n, l in enumerate(levels, 1):
         l['id'] = n
@@ -115,7 +143,7 @@ def assemble(path='levels-200.json'):
                 lantern="[x,y,color,capacity]", wisp="[x,y,color]",
                 gate="[x,y,lanternIndex]", arrow="[x,y,direction]")
     json.dump(dict(meta=meta, levels=levels), open(path,'w'), ensure_ascii=False, separators=(',',':'))
-    print(f"{len(levels)} bölüm doğrulandı -> {path}")
+    print(f"{len(levels)} bölüm doğrulandı -> {os.path.relpath(path, os.path.join(HERE, '..'))}")
 
 if __name__ == '__main__':
     if sys.argv[1] == 'chapter': build_chapter(int(sys.argv[2]), float(sys.argv[3]))
