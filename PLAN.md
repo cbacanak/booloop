@@ -721,6 +721,11 @@ booloop/
   okumaları ve Games uygulaması iOS 26 ile geldi (§6.2.2). App Store
   28 Nis 2026'dan beri Xcode 26 / iOS 26 SDK ile derleme istiyor;
   Nisan 2027'de iOS 27 SDK şartı beklenir.
+  - **Bedeli:** aynı veriye göre iOS 26 hedefi bütün iPhone'ların
+    yaklaşık %21'ini, son dört yılın iPhone'larının %14'ünü dışarıda
+    bırakır. Bu oyuncular Game Center meydan okumaları ve Games
+    uygulaması karşılığında veriliyor. Karar bilinçli; Aşama 4'te güncel
+    sürüm paylarıyla yeniden bakılır.
 - **Ekran:** tahta yerleşimi güvenli alanı (Dynamic Island, ana ekran
   çubuğu) hesaba katar; en küçük ve en büyük iPhone'da test edilir.
   120 Hz için Info.plist'te `CADisableMinimumFrameDurationOnPhone = YES`
@@ -959,14 +964,37 @@ Aşama 4'te Apple ve Google'ın kendi sayfasından yeniden okunur.
   dair Apple yönlendirmesi bulunamadı. Aşama 4'te anketin o anki
   metnine göre karar verilir. Beklenen derece 4+ ya da 9+.
 
-**Yaş güvencesi (ABD)**
+**Yaş güvencesi (ABD, Brezilya)**
 - Texas SB 2420 yürürlükte: Apple 4 Haz 2026'dan beri uyguluyor, ABD
-  Yüksek Mahkemesi 6 Tem 2026'da durdurma talebini reddetti. Alabama
-  1 Oca 2027, Utah 6 May 2027, Louisiana 1 Tem 2027.
-- Apple geliştiriciden Declared Age Range API'yi, "önemli değişiklik"
-  bildirimini, StoreKit'teki yaş derecesi alanını ve ebeveyn onayının
-  geri çekildiği sunucu bildirimlerini kullanmasını istiyor; yasanın
-  gerektirdiği yerde kullanıcının yaşını kontrol etmek zorunlu.
+  Yüksek Mahkemesi 6 Tem 2026'da durdurma talebini reddetti.
+- **Texas tarihçesi:**
+  - 4 Kas 2025: Apple, kuralların 1 Oca 2026'da yeni Texas
+    hesaplarında başlayacağını duyurdu
+    (developer.apple.com/news/?id=2ezb6jhj).
+  - 23 Ara 2025: bölge mahkemesi yasayı askıya aldı; Apple uygulama
+    planlarını durdurdu, araçları sandbox testine açık bıraktı
+    (news/?id=8jzbigf4).
+  - 3 Haz 2026: askı bir mahkeme kararıyla kalktı; kurallar 4 Haz
+    2026'dan itibaren yeni Texas hesaplarında uygulanıyor
+    (news/?id=sg176nne).
+- **Brezilya:** Apple'ın 4 Kas 2025 duyurusu Utah ve Louisiana ile
+  birlikte Brezilya'yı gelecek yükümlülükler arasında sayıyor. Tarih
+  vermiyor.
+- **Diğer eyaletler, doğrulanmadı:** Alabama 1 Oca 2027, Utah 6 May
+  2027, Louisiana 1 Tem 2027. Bu tarihler Apple sayfalarından değil,
+  hukuk bürosu yazılarından alındı. Apple'ın 23 Ara 2025 duyurusu ise
+  Utah ve Louisiana yasalarının 2026'da yürürlüğe gireceğini söylüyor.
+  Aşama 4'te Apple'ın sayfasından yeniden okunur.
+- **Araçlar** (Apple'ın üç duyurusunda da aynı dört araç):
+  - Declared Age Range API: kullanıcının yaş aralığı.
+  - Significant Change API (PermissionKit): önemli bir değişiklikte
+    ebeveyn onayı ister.
+  - StoreKit'teki yaş derecesi özelliği (`ageRatingCode`): uygulamanın
+    yaş derecesi değişti mi.
+  - App Store Server Notifications: ebeveyn onayını geri çekti mi.
+- Yasanın gerektirdiği yerde kullanıcının yaşını kontrol etmek zorunlu.
+  Uygulamada neyin "önemli değişiklik" sayıldığına geliştirici karar
+  verir.
 - Hesapsız ya da 4+/9+ uygulamalar için resmi bir muafiyet bulunamadı.
   Hukukçu özetlerine göre satın alma akışında Apple'ın yaş ve onay
   sinyaline dayanmak yeterli görünüyor. **Doğrulanmadı;** Aşama 4'te
@@ -1073,6 +1101,17 @@ Aşama 4'te Apple ve Google'ın kendi sayfasından yeniden okunur.
     (Aşama 4, §12.4)
 13. Coin ekonomisi fazla cömert mi? (§7.5; Aşama 5 verisi)
 14. "Haftanın gecesi" skor formülü (§6.2.2; Aşama 3)
+15. Swift dil kipi. project.yml'de `SWIFT_VERSION: "5.0"` ve
+    `SWIFT_STRICT_CONCURRENCY: minimal` var; BooloopCore ise
+    `swift-tools-version:6.2` ile Swift 6 kipinde derleniyor. Xcode 26'da
+    Swift 6 varsayılan; uygulama hedefi için bu açık bir geri alma ve
+    gerekçesi yazılı değil. Tarihi ve gerekçesi olan bir karar olmalı;
+    kod büyüdükçe Swift 6'ya geçmek pahalılaşır.
+16. Reklamın asla çıkmayacağı anlar. §7.1 geçiş reklamını yalnızca
+    başarısızlık ekranında, günlük modda ve ilk oturumda yasaklıyor.
+    Geri al ya da çıkmaz göstergesinden sonrası, seviye tekrarı ve ödüllü
+    reklam tekliflerinin zamanı için genel bir kural yok. Hepsi tek bir
+    listede toplanmalı (Aşama 4, reklam entegrasyonundan önce).
 
 **18 Eyl'de kapananlar:** deployment target → iOS 26 (§10.3); iCloud
 senkronu → Aşama 3'te zorunlu (§10.3); günlük modun saat dilimi →
