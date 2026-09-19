@@ -20,7 +20,7 @@ settings:
     IPHONEOS_DEPLOYMENT_TARGET: "26.0"
     TARGETED_DEVICE_FAMILY: "1"          # yalnızca iPhone
     CODE_SIGN_STYLE: Automatic
-    DEVELOPMENT_TEAM: ""                  # Xcode > Signing & Capabilities'te seçilir
+    DEVELOPMENT_TEAM: BGA7C55R77          # Caglar Bacanak (Personal Team)
     ENABLE_USER_SCRIPT_SANDBOXING: YES
     SWIFT_STRICT_CONCURRENCY: minimal
 
@@ -47,6 +47,9 @@ targets:
         MARKETING_VERSION: "0.1.0"
         CURRENT_PROJECT_VERSION: "1"
         GENERATE_INFOPLIST_FILE: NO
+        # Info.plist elle tutulur, bu dosyadan üretilmez; Xcode kaydederken anahtarları sıralar
+        # ve XML yorumlarını siler, bu yüzden gerekçeler burada durur:
+        #   CADisableMinimumFrameDurationOnPhone = YES → 120 Hz ProMotion (PLAN.md §10.3)
         INFOPLIST_FILE: Booloop/Info.plist
         SUPPORTED_INTERFACE_ORIENTATIONS: UIInterfaceOrientationPortrait
         SUPPORTED_INTERFACE_ORIENTATIONS_IPHONE: UIInterfaceOrientationPortrait
