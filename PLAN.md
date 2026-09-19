@@ -984,7 +984,9 @@ Aşama 4'te Apple ve Google'ın kendi sayfasından yeniden okunur.
   2027, Louisiana 1 Tem 2027. Bu tarihler Apple sayfalarından değil,
   hukuk bürosu yazılarından alındı. Apple'ın 23 Ara 2025 duyurusu ise
   Utah ve Louisiana yasalarının 2026'da yürürlüğe gireceğini söylüyor.
-  Aşama 4'te Apple'ın sayfasından yeniden okunur.
+  Bu ifade Ara 2025 tarihli. Hukuk bürosu yazılarına göre iki eyalet de
+  yürürlüğü sonradan yasa değişikliğiyle 2027'ye erteledi. Aşama 4'te
+  Apple'ın sayfasından yeniden okunur.
 - **Araçlar** (Apple'ın üç duyurusunda da aynı dört araç):
   - Declared Age Range API: kullanıcının yaş aralığı.
   - Significant Change API (PermissionKit): önemli bir değişiklikte
